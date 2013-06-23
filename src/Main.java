@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -10,10 +11,24 @@ import javax.swing.*;
 public class Main extends JFrame{
 
     Main(String name){
-       setTitle(name);
-        setSize(200,200);
-        setVisible(true);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        setTitle(name);                                                               //タイトルの設定
+        setSize(300,300);                                                            //サイズの設定
+        setVisible(true);                                                              //表示
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);        //×を押した時の動作（プログラム終了）
+
+        JPanel panel1 = new JPanel();                                          //パネル作成
+        panel1.setBackground(Color.blue);                                   //背景色の設定
+        panel1.setPreferredSize(new Dimension(100,200));           //パネルのサイズを設定 Dimension(int width,int height)
+
+        JPanel panel2 = new JPanel();
+        panel2.setBackground(Color.YELLOW);
+        panel2.setPreferredSize(new Dimension(100,200));
+
+        setLayout(new FlowLayout());
+        add(panel1);
+        add(panel2);
+
     }
 
     public static void main(String[] args){

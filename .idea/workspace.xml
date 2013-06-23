@@ -3,12 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="2cf5993c-5864-4500-aa4e-d6a4614cd353" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Main.java" afterPath="$PROJECT_DIR$/src/Main.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="pro.iws" />
     <ignored path=".idea/workspace.xml" />
     <file path="/Dummy.txt" changelist="2cf5993c-5864-4500-aa4e-d6a4614cd353" time="1371948291582" ignored="false" />
-    <file path="/Main.java" changelist="2cf5993c-5864-4500-aa4e-d6a4614cd353" time="1371949375057" ignored="false" />
+    <file path="/Main.java" changelist="2cf5993c-5864-4500-aa4e-d6a4614cd353" time="1371951519204" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,8 +71,10 @@
       <file leaf-file-name="Main.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="22" column="0" selection-start="450" selection-end="450" vertical-scroll-proportion="0.7504488">
-              <folding />
+            <state line="21" column="111" selection-start="904" selection-end="904" vertical-scroll-proportion="0.5224416">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -510,8 +511,10 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="0" selection-start="450" selection-end="450" vertical-scroll-proportion="0.7504488">
-          <folding />
+        <state line="21" column="111" selection-start="904" selection-end="904" vertical-scroll-proportion="0.5224416">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
