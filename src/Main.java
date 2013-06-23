@@ -17,16 +17,26 @@ public class Main extends JFrame{
         setVisible(true);                                                              //表示
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);        //×を押した時の動作（プログラム終了）
 
+        /*Panelの設定
+        * 背景色の設定→JPanel#setBackgroun
+        * サイズの設定→JPanel#setPreferredSize(Dimention)
+        * 透明度の設定→JPanel#setOpaque(boolean)不透明でない場合はtrue
+        * 枠線の設定　→JPanel#setBorder(Border) interface border
+        * */
+        JLabel label = new JLabel("POTATO");
+
         JPanel panel1 = new JPanel();                                          //パネル作成
         panel1.setBackground(Color.blue);                                   //背景色の設定
         panel1.setPreferredSize(new Dimension(100,200));           //パネルのサイズを設定 Dimension(int width,int height)
+        panel1.add(label);
 
         JPanel panel2 = new JPanel();
         panel2.setBackground(Color.YELLOW);
         panel2.setPreferredSize(new Dimension(100,200));
 
-        setLayout(new FlowLayout());
-        add(panel1);
+        setLayout(new FlowLayout());                                         //FlowLayoutにて設定
+
+        add(panel1);                                                                   //パネルの追加
         add(panel2);
 
     }
