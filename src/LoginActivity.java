@@ -1,4 +1,5 @@
 import twitter4j.Twitter;
+import twitter4j.TwitterFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,6 +28,10 @@ public class LoginActivity  extends JFrame{
 
     LoginActivity(String name){
         setLayout(name);
+
+        twitter = new TwitterFactory().getInstance();
+        twitter.setOAuthConsumer(null,null);
+
     }
 
     //Layoutについてはこっちで行う。
