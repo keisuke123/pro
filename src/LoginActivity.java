@@ -1,3 +1,5 @@
+import twitter4j.Twitter;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -21,10 +23,14 @@ public class LoginActivity  extends JFrame{
     JButton b1 = new JButton("Open Browser");
     JTextField tf = new JTextField(15);
 
+    Twitter twitter;
+
     LoginActivity(String name){
-      //  setTitle(name);
-     //   setSize(200,100);
-      //  setVisible(true);
+        setLayout(name);
+    }
+
+    //Layoutについてはこっちで行う。
+    private void setLayout(String name){
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         b1.addActionListener(new ActionListener() {
@@ -62,8 +68,11 @@ public class LoginActivity  extends JFrame{
         dialog.setLocationRelativeTo(null);
         dialog.setModal(false);
         dialog.setVisible(true);
+
+        return;
     }
 
+    //main文
     public static void main(String[] args){
         new LoginActivity("Login");
     }
