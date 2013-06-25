@@ -29,7 +29,8 @@ public class LoginActivity  extends JFrame{
     JButton b2 = new JButton("Enter");
     JTextField tf = new JTextField(15);
 
-    Twitter twitter;
+    JDialog dialog;
+    public Twitter twitter;
 
     RequestToken rt;
 
@@ -70,9 +71,11 @@ public class LoginActivity  extends JFrame{
                 try {
                     String text = tf.getText();
                     AccessToken ac = twitter.getOAuthAccessToken(rt,text);
+                    twitter.updateStatus("てすと");
                 } catch (TwitterException e1) {
                     e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
+                dialog.dispose();
             }
         });
     }
@@ -91,7 +94,7 @@ public class LoginActivity  extends JFrame{
 
         p3.add(b2);
 
-        JDialog dialog = new JDialog();
+         dialog = new JDialog();
         dialog.setResizable(false); //フレームのサイズを変更できるかどうか
         dialog.add(p1);
         dialog.add(p2);
@@ -104,11 +107,6 @@ public class LoginActivity  extends JFrame{
         dialog.setVisible(true);
 
         return;
-    }
-
-    //main文
-    public static void main(String[] args){
-        new LoginActivity("Login");
     }
 
 }
