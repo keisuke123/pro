@@ -8,9 +8,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Properties;
 
 /**
  * Created with IntelliJ IDEA.
@@ -35,7 +36,10 @@ public class LoginActivity  extends JFrame{
     RequestToken rt;
 
     String url;
-
+    Properties prop = new Properties();
+    File file = new File("./src\\twitter4j.properties");
+    InputStream is = null;
+    OutputStream os = null;
     LoginActivity(String name){
         setLayout(name);
 
@@ -71,8 +75,20 @@ public class LoginActivity  extends JFrame{
                 try {
                     String text = tf.getText();
                     AccessToken ac = twitter.getOAuthAccessToken(rt,text);
-                    twitter.updateStatus("てすと");
+
+                    is = new FileInputStream(file);
+                    prop.load(is);
+                    prop.setProperty("oauth.accessToken",ac.getToken());
+                    prop.setProperty("oauth.accessTokenSecret",ac.getTokenSecret());
+                    os = new FileOutputStream(file);
+                    prop.store(os,"twitter4j.properties");
+                    os.close();
+                    is.close();
                 } catch (TwitterException e1) {
+                    e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (IOException e1) {
                     e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
                 dialog.dispose();
