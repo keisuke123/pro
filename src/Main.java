@@ -1,5 +1,11 @@
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+
 import javax.swing.*;
 import java.awt.*;
+import java.io.*;
+import java.util.Properties;
 
 /**
  * Created with IntelliJ IDEA.
@@ -42,6 +48,22 @@ public class Main extends JFrame{
     }
 
     public static void main(String[] args){
+        Properties prop = new Properties();
+        InputStream io = null;
+        try {
+            io = new FileInputStream(new File("./src\\twitter4j.properties"));
+            prop.load(io);
+
+            //もしAccessTokenが保存されていなかったら
+            if(prop.getProperty("oauth.accessToken")==null){
+                new LoginActivity("hoge");
+            }
+            io.close();
+        } catch (FileNotFoundException e){
+        }catch(IOException ioe){
+        }
         new Main("hoge");
+
+
     }
 }
