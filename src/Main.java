@@ -29,22 +29,33 @@ public class Main extends JFrame{
         * 透明度の設定→JPanel#setOpaque(boolean)不透明でない場合はtrue
         * 枠線の設定　→JPanel#setBorder(Border) interface border
         * */
-        JLabel label = new JLabel("POTATO");
 
         JPanel panel1 = new JPanel();                                          //パネル作成
-        panel1.setBackground(Color.blue);                                   //背景色の設定
-        panel1.setPreferredSize(new Dimension(100,200));           //パネルのサイズを設定 Dimension(int width,int height)
-        panel1.add(label);
+        JTextField text = new JTextField();
+        JButton button = new JButton("Tweet");
 
+        //Dimension(縦と横に関する情報)の最大値取得
+        Dimension d1 = text.getMaximumSize();
+        Dimension d2 = button.getMaximumSize();
+
+        //Short型の最大サイズ
+        d1.width = Short.MAX_VALUE;
+        //ボタンの高さに揃える
+        d1.height = d2.height;
+        //値をセット
+        text.setMaximumSize(d1);
+
+        panel1.setLayout(new BoxLayout(panel1,BoxLayout.LINE_AXIS));
+        panel1.add(text);
+        panel1.add(button);
+
+        JScrollPane pane = new JScrollPane();
         JPanel panel2 = new JPanel();
-        panel2.setBackground(Color.YELLOW);
-        panel2.setPreferredSize(new Dimension(100,200));
+        panel2.setLayout(new BoxLayout(panel2,BoxLayout.PAGE_AXIS));
+        panel2.add(panel1);
+        panel2.add(pane);
 
-        setLayout(new FlowLayout());                                         //FlowLayoutにて設定
-
-        add(panel1);                                                                   //パネルの追加
         add(panel2);
-
     }
 
     public static void main(String[] args){
@@ -63,6 +74,8 @@ public class Main extends JFrame{
         }catch(IOException ioe){
         }
         new Main("hoge");
+
+        Twitter twitter = new TwitterFactory().getInstance();
 
 
     }
