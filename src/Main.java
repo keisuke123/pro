@@ -1,11 +1,22 @@
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 import javax.swing.*;
-import java.awt.*;
-import java.io.*;
-import java.util.Properties;
+
+import javafx.scene.control.ListCell;
+import twitter4j.*;
+import twitter4j.auth.AccessToken;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,22 +27,29 @@ import java.util.Properties;
  */
 public class Main extends JFrame{
 
+    JPanel panel1;
+    final JTextField text = null;
+    JButton button;
+
+    static InputStream io = null;
+    static ArrayList<String> tweet = new ArrayList<String>();
+    static long id;
+    static List<Status>timeline = null;
     Main(String name){
 
-        setTitle(name);                                                               //タイトルの設定
-        setSize(300,300);                                                            //サイズの設定
-        setVisible(true);                                                              //表示
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);        //×を押した時の動作（プログラム終了）
+        setTitle(name); //タイトルの設定
+        setSize(500,500); //サイズの設定
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //×を押した時の動作（プログラム終了）
 
         /*Panelの設定
-        * 背景色の設定→JPanel#setBackgroun
-        * サイズの設定→JPanel#setPreferredSize(Dimention)
-        * 透明度の設定→JPanel#setOpaque(boolean)不透明でない場合はtrue
-        * 枠線の設定　→JPanel#setBorder(Border) interface border
-        * */
+         * 背景色の設定→JPanel#setBackgroun
+         * サイズの設定→JPanel#setPreferredSize(Dimention)
+         * 透明度の設定→JPanel#setOpaque(boolean)不透明でない場合はtrue
+         * 枠線の設定　→JPanel#setBorder(Border) interface border
+         * */
 
-        JPanel panel1 = new JPanel();                                          //パネル作成
-        JTextField text = new JTextField();
+        JPanel panel1 = new JPanel(); //パネル作成
+        final JTextField text = new JTextField();
         JButton button = new JButton("Tweet");
 
         //Dimension(縦と横に関する情報)の最大値取得
@@ -49,34 +67,123 @@ public class Main extends JFrame{
         panel1.add(text);
         panel1.add(button);
 
+        JList<Object> list = new JList<Object>(timeline.toArray());
+        list.setCellRenderer(new setTimeline());
+
         JScrollPane pane = new JScrollPane();
+        pane.getViewport().setView(list);
         JPanel panel2 = new JPanel();
         panel2.setLayout(new BoxLayout(panel2,BoxLayout.PAGE_AXIS));
         panel2.add(panel1);
         panel2.add(pane);
 
         add(panel2);
+
+        button.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // TODO 自動生成されたメソッド・スタブ
+                String tweet = text.getText();
+                Twitter twitter = getInst();
+                try {
+                    twitter.updateStatus(tweet);
+                    text.setText("");
+                } catch (TwitterException e1) {
+                    // TODO 自動生成された catch ブロック
+                    e1.printStackTrace();
+                }
+            }
+        });
+        setVisible(true); //表示
     }
 
     public static void main(String[] args){
+        Properties prop;
+
+        prop = getprop();
+        //もしAccessTokenが保存されていなかったら
+        if(prop.getProperty("oauth.accessToken")==null){
+            new LoginActivity("hoge");
+        }
+
+        try {
+            io.close();
+        } catch (IOException e) {
+            // TODO 自動生成された catch ブロック
+            e.printStackTrace();
+        }
+
+        Twitter twitter = getInst();
+        try {
+            timeline = twitter.getHomeTimeline(new Paging(1,200));
+        } catch (TwitterException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        for(Status status : timeline){
+            tweet.add(status.getText());
+        }
+
+        new Main("hoge");
+
+    }
+
+    static Properties getprop(){
         Properties prop = new Properties();
-        InputStream io = null;
         try {
             io = new FileInputStream(new File("./src\\twitter4j.properties"));
             prop.load(io);
-
-            //もしAccessTokenが保存されていなかったら
-            if(prop.getProperty("oauth.accessToken")==null){
-                new LoginActivity("hoge");
-            }
-            io.close();
-        } catch (FileNotFoundException e){
-        }catch(IOException ioe){
+        } catch (FileNotFoundException e) {
+            // TODO 自動生成された catch ブロック
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO 自動生成された catch ブロック
+            e.printStackTrace();
         }
-        new Main("hoge");
+        return prop;
+    }
 
+    static Twitter getInst(){
         Twitter twitter = new TwitterFactory().getInstance();
+        twitter.setOAuthAccessToken(new AccessToken(getprop().getProperty("oauth.accessToken"),getprop().getProperty("oauth.accessTokenSecret")));
+        return twitter;
+    }
 
+    class setTimeline implements ListCellRenderer{
 
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            Status status = (Status)value;
+            //サムネと名前
+            JLabel image = null;
+            try {
+                image = new JLabel(new ImageIcon(new URL(status.getUser().getProfileImageURL())));
+            } catch (MalformedURLException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+            JLabel name = new JLabel(status.getText());
+
+            //パネル
+            JPanel panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
+            panel.setSize(Short.MAX_VALUE,100);
+            panel.setPreferredSize(new Dimension(Short.MAX_VALUE,100));
+            panel.setMinimumSize(new Dimension(Short.MAX_VALUE,100));
+
+            image.setSize(50,50);
+            image.setPreferredSize(new Dimension(50, 50));
+            image.setMinimumSize(new Dimension(50,50));
+
+            Dimension d1 = name.getMaximumSize();
+            d1.width = Short.MAX_VALUE;
+            name.setMaximumSize(d1);
+  
+
+            panel.add(image);
+            panel.add(name);
+
+            return panel;  //To change body of implemented methods use File | Settings | File Templates.
+        }
     }
 }
