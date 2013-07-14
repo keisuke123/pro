@@ -3,6 +3,8 @@ import twitter4j.auth.AccessToken;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,16 +22,19 @@ import java.util.Properties;
  * Time: 9:45
  * To change this template use File | Settings | File Templates.
  */
-public class Main extends JFrame{
+public class Main extends JFrame implements ListSelectionListener{
 
-    JPanel panel1;
-    final JTextField text = null;
-    JButton button;
+    private JPanel panel1;
+    private final JTextField text = null;
+    private JButton button;
 
-    static InputStream io = null;
-    static ArrayList<String> tweet = new ArrayList<String>();
-    static long id;
-    static List<Status>timeline = null;
+    private static InputStream io = null;
+    private static ArrayList<String> tweet = new ArrayList<String>();
+    private static long id;
+    private static List<Status>timeline = null;
+
+    int old = 0;
+    JList<Object> list;
     Main(String name){
 
         setTitle(name); //タイトルの設定
@@ -62,8 +67,9 @@ public class Main extends JFrame{
         panel1.add(text);
         panel1.add(button);
 
-        JList<Object> list = new JList<Object>(timeline.toArray());
+        list = new JList<Object>(timeline.toArray());
         list.setCellRenderer(new setTimeline());
+        list.addListSelectionListener(this);
 
         JScrollPane pane = new JScrollPane();
         pane.getViewport().setView(list);
@@ -110,6 +116,46 @@ public class Main extends JFrame{
         Twitter twitter = new TwitterFactory().getInstance();
         twitter.setOAuthAccessToken(new AccessToken(getprop().getProperty("oauth.accessToken"),getprop().getProperty("oauth.accessTokenSecret")));
         return twitter;
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+
+        final Status status = (Status)list.getSelectedValue();
+
+        if(old!=list.getSelectedIndex()){
+        old = list.getSelectedIndex();
+        final JDialog dialog = new JDialog();
+        JPanel panel = new JPanel();
+        final JTextArea text = new JTextArea(3,1);
+        final JButton button = new JButton("送信");
+
+        button.setAlignmentX(0.5f);
+        text.setLineWrap(true);
+        panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
+        panel.add(text);
+        panel.add(button);
+        dialog.setResizable(true); //フレームのサイズを変更できるかどうか
+        dialog.add(panel);
+        dialog.setLocationRelativeTo(null);
+        dialog.setSize(new Dimension(400,200));
+        dialog.setVisible(true);
+
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Twitter twitter = getInst();
+                String message = text.getText();
+                try {
+                    twitter.sendDirectMessage(status.getUser().getScreenName(),message);
+                    dialog.dispose();
+                } catch (TwitterException e1) {
+                    e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            }
+        });
+
+        }
     }
 
     class setTimeline implements ListCellRenderer{
@@ -159,9 +205,41 @@ public class Main extends JFrame{
             panel.add(image);
             panel.add(name);
 
+
             return panel;  //To change body of implemented methods use File | Settings | File Templates.
         }
     }
+
+    /*
+    private void sendMessage(final Status status){
+        JDialog dialog = new JDialog();
+        JPanel panel = new JPanel();
+        final JTextArea text = new JTextArea(3,1);
+        JButton button = new JButton("送信");
+
+        panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
+        panel.add(text);
+        panel.add(button);
+        dialog.setResizable(true); //フレームのサイズを変更できるかどうか
+        dialog.add(panel);
+        dialog.setLocationRelativeTo(null);
+        dialog.setSize(new Dimension(400,200));
+        dialog.setVisible(true);
+
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Twitter twitter = getInst();
+                String message = text.getText();
+                try {
+                    twitter.sendDirectMessage(status.getUser().getScreenName(),message);
+                } catch (TwitterException e1) {
+                    e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            }
+        });
+    }
+    */
 
     public static void main(String[] args){
         Properties prop;
@@ -189,8 +267,6 @@ public class Main extends JFrame{
         for(Status status : timeline){
             tweet.add(status.getText());
         }
-
         new Main("hoge");
-
     }
 }
