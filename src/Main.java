@@ -1,5 +1,7 @@
-import twitter4j.*;
-import twitter4j.auth.AccessToken;
+import twitter4j.Paging;
+import twitter4j.Status;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -8,7 +10,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -33,14 +35,17 @@ public class Main extends JFrame implements ListSelectionListener{
     private static long id;
     private static List<Status>timeline = null;
 
+    private int height = 0;
+    private int width = 450;
     int old = 0;
+    int count=0;
+
     JList<Object> list;
     Main(String name){
 
         setTitle(name); //タイトルの設定
-        setSize(500,500); //サイズの設定
+        setSize(900,500); //サイズの設定
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //×を押した時の動作（プログラム終了）
-
         /*Panelの設定
          * 背景色の設定→JPanel#setBackgroun
          * サイズの設定→JPanel#setPreferredSize(Dimention)
@@ -85,7 +90,7 @@ public class Main extends JFrame implements ListSelectionListener{
             @Override
             public void actionPerformed(ActionEvent e) {
                 String tweet = text.getText();
-                Twitter twitter = getInst();
+                Twitter twitter = Utils.getInst();
                 try {
                     twitter.updateStatus(tweet);
                     text.setText("");
@@ -97,66 +102,47 @@ public class Main extends JFrame implements ListSelectionListener{
         setVisible(true); //表示
     }
 
-
-
-    static Properties getprop(){
-        Properties prop = new Properties();
-        try {
-            io = new FileInputStream(new File("./src\\twitter4j.properties"));
-            prop.load(io);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return prop;
-    }
-
-    static Twitter getInst(){
-        Twitter twitter = new TwitterFactory().getInstance();
-        twitter.setOAuthAccessToken(new AccessToken(getprop().getProperty("oauth.accessToken"),getprop().getProperty("oauth.accessTokenSecret")));
-        return twitter;
-    }
-
     @Override
     public void valueChanged(ListSelectionEvent e) {
 
         final Status status = (Status)list.getSelectedValue();
 
         if(old!=list.getSelectedIndex()){
-        old = list.getSelectedIndex();
-        final JDialog dialog = new JDialog();
-        JPanel panel = new JPanel();
-        final JTextArea text = new JTextArea(3,1);
-        final JButton button = new JButton("送信");
+            old = list.getSelectedIndex();
+            final JDialog dialog = new JDialog();
+            JPanel panel = new JPanel();
+            final JTextArea text = new JTextArea(3,1);
+            final JButton button = new JButton("送信");
 
-        button.setAlignmentX(0.5f);
-        text.setLineWrap(true);
-        panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
-        panel.add(text);
-        panel.add(button);
-        dialog.setResizable(true); //フレームのサイズを変更できるかどうか
-        dialog.add(panel);
-        dialog.setLocationRelativeTo(null);
-        dialog.setSize(new Dimension(400,200));
-        dialog.setVisible(true);
+            button.setAlignmentX(0.5f);
+            text.setLineWrap(true);
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            panel.add(text);
+            panel.add(button);
+            dialog.setResizable(true); //フレームのサイズを変更できるかどうか
+            dialog.add(panel);
+            dialog.setLocationRelativeTo(null);
+            dialog.setSize(new Dimension(400, 200));
+            dialog.setTitle("send DirectMessage To @"+status.getUser().getScreenName());
+            dialog.setVisible(true);
 
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Twitter twitter = getInst();
-                String message = text.getText();
-                try {
-                    twitter.sendDirectMessage(status.getUser().getScreenName(),message);
-                    dialog.dispose();
-                } catch (TwitterException e1) {
-                    e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    Twitter twitter = Utils.getInst();
+                    String message = text.getText();
+                    try {
+                        twitter.sendDirectMessage(status.getUser().getScreenName(),message);
+                        dialog.dispose();
+                    } catch (TwitterException e1) {
+                        e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
                 }
-            }
-        });
+            });
 
         }
     }
+
 
     class setTimeline implements ListCellRenderer{
 
@@ -179,14 +165,14 @@ public class Main extends JFrame implements ListSelectionListener{
 
             String[] array = tweet.split("\n");
             int count = array.length;
-            int size = count>2?25*count : 60;
+            height = count>2?27*count : 65;
 
             //パネル
             JPanel panel = new JPanel();
             panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
-            panel.setSize(Short.MAX_VALUE,60);
-            panel.setPreferredSize(new Dimension(Short.MAX_VALUE,size));
-            panel.setMinimumSize(new Dimension(Short.MAX_VALUE,size));
+            panel.setSize(Short.MAX_VALUE, 60);
+            panel.setPreferredSize(new Dimension(width, height));
+            panel.setMinimumSize(new Dimension(width, height));
             panel.setBorder(new LineBorder(Color.black,1));
 
             image.setSize(50,50);
@@ -199,8 +185,9 @@ public class Main extends JFrame implements ListSelectionListener{
 
             name.setRows(count);
             name.setEditable(false);
-            name.setPreferredSize(new Dimension(Short.MAX_VALUE,size));
-            name.setMargin(new Insets(0,0,5,0));
+            name.setPreferredSize(null); //new Dimension(Short.MAX_VALUE,size));
+            name.setMargin(new Insets(0, 0, 5, 0));
+            name.setLineWrap(true);
 
             panel.add(image);
             panel.add(name);
@@ -210,54 +197,17 @@ public class Main extends JFrame implements ListSelectionListener{
         }
     }
 
-    /*
-    private void sendMessage(final Status status){
-        JDialog dialog = new JDialog();
-        JPanel panel = new JPanel();
-        final JTextArea text = new JTextArea(3,1);
-        JButton button = new JButton("送信");
-
-        panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
-        panel.add(text);
-        panel.add(button);
-        dialog.setResizable(true); //フレームのサイズを変更できるかどうか
-        dialog.add(panel);
-        dialog.setLocationRelativeTo(null);
-        dialog.setSize(new Dimension(400,200));
-        dialog.setVisible(true);
-
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Twitter twitter = getInst();
-                String message = text.getText();
-                try {
-                    twitter.sendDirectMessage(status.getUser().getScreenName(),message);
-                } catch (TwitterException e1) {
-                    e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
-            }
-        });
-    }
-    */
-
     public static void main(String[] args){
         Properties prop;
 
-        prop = getprop();
+        prop = Utils.getprop();
 
         //もしAccessTokenが保存されていなかったら
         if(prop.getProperty("oauth.accessToken")==null){
             new LoginActivity("hoge");
         }
 
-        try {
-            io.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Twitter twitter = getInst();
+        Twitter twitter = Utils.getInst();
         try {
             timeline = twitter.getHomeTimeline(new Paging(1,200));
         } catch (TwitterException e) {
