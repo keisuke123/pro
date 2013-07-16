@@ -21,10 +21,17 @@ public class Utils {
         return twitter;
     }
 
+    static String getPass(){
+        String jarPath = System.getProperty("java.class.path");
+        String dirPath = jarPath.substring(0, jarPath.lastIndexOf(File.separator)+1);
+        return dirPath;
+    }
+
     static Properties getprop(){
         Properties prop = new Properties();
         try {
-            InputStream io = new FileInputStream(new File("./src\\twitter4j.properties"));
+            String dirPath = getPass();
+            InputStream io = new FileInputStream(new File(dirPath  +"twitter4j.properties"));
             prop.load(io);
             io.close();
         } catch (FileNotFoundException e) {
@@ -57,14 +64,14 @@ public class Utils {
 
     static ArrayList<String> getTweet(){
         ArrayList<String> tweet = new ArrayList<String>();
-    	Twitter twitter = getInst();
-    	java.util.List<Status> list = null;
+        Twitter twitter = getInst();
+        java.util.List<Status> list = null;
         list = getTimeLine();
         for(Status status : list){
             tweet.add(status.getText());
         }
 
-    	return tweet;
+        return tweet;
     }
 
     static  ResponseList<Status> getTimeLine(){
