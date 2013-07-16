@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.xml.ws.Response;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,12 +20,12 @@ import java.util.List;
 import java.util.Properties;
 
 /**
-* Created with IntelliJ IDEA.
-* User: keisuke
-* Date: 13/06/23
-* Time: 9:45
-* To change this template use File | Settings | File Templates.
-*/
+ * Created with IntelliJ IDEA.
+ * User: keisuke
+ * Date: 13/06/23
+ * Time: 9:45
+ * To change this template use File | Settings | File Templates.
+ */
 public class Main extends JFrame implements ListSelectionListener{
 
     private JPanel panel1;
@@ -42,6 +43,7 @@ public class Main extends JFrame implements ListSelectionListener{
     int count=0;
 
     JList list;
+
     private Dialog dialog;
     Main(String name){
 
@@ -57,11 +59,11 @@ public class Main extends JFrame implements ListSelectionListener{
 
         JPanel panel1 = new JPanel(); //パネル作成
         final JTextField text = new JTextField();
-        JButton button = new JButton("Tweet");
+        JButton button1 = new JButton("Tweet");
 
         //Dimension(縦と横に関する情報)の最大値取得
         Dimension d1 = text.getMaximumSize();
-        Dimension d2 = button.getMaximumSize();
+        Dimension d2 = button1.getMaximumSize();
 
         //Short型の最大サイズ
         d1.width = Short.MAX_VALUE;
@@ -76,38 +78,38 @@ public class Main extends JFrame implements ListSelectionListener{
         JMenuItem item = new JMenuItem("Send DM");
         final JTextField field = new JTextField();
         item.addActionListener(new ActionListener() {
-    		@Override
-			public void actionPerformed(ActionEvent e) {
-	            JPanel panel = new JPanel();
-	            final JTextArea text = new JTextArea(3,1);
-	            JButton button = new JButton("送信");
-	            button.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						String str = text.getText();
-						String name = field.getText();
-						Twitter twitter = Utils.getInst();
-						try {
-							twitter.sendDirectMessage(name,str);
-						} catch (TwitterException e1) {
-							// TODO 自動生成された catch ブロック
-							e1.printStackTrace();
-						}
-						dialog.dispose();
-					}
-				});
-	            field.setPreferredSize(new Dimension(Short.MAX_VALUE,50));
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JPanel panel = new JPanel();
+                final JTextArea text = new JTextArea(3,1);
+                JButton button = new JButton("送信");
+                button.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        String str = text.getText();
+                        String name = field.getText();
+                        Twitter twitter = Utils.getInst();
+                        try {
+                            twitter.sendDirectMessage(name,str);
+                        } catch (TwitterException e1) {
+                            // TODO 自動生成された catch ブロック
+                            e1.printStackTrace();
+                        }
+                        dialog.dispose();
+                    }
+                });
+                field.setPreferredSize(new Dimension(Short.MAX_VALUE,50));
 
-	            button.setAlignmentX(0.5f);
-	            text.setLineWrap(true);
-	            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-	            panel.add(field);
-	            panel.add(text);
-	            panel.add(button);
-				dialog = Utils.makeDialog("DirectMessage",panel);
-				dialog.setVisible(true);
-			}
-		});
+                button.setAlignmentX(0.5f);
+                text.setLineWrap(true);
+                panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+                panel.add(field);
+                panel.add(text);
+                panel.add(button);
+                dialog = Utils.makeDialog("DirectMessage",panel);
+                dialog.setVisible(true);
+            }
+        });
 
 
         menu.add(item);
@@ -115,7 +117,7 @@ public class Main extends JFrame implements ListSelectionListener{
 
         panel1.setLayout(new BoxLayout(panel1,BoxLayout.LINE_AXIS));
         panel1.add(text);
-        panel1.add(button);
+        panel1.add(button1);
 
         list = new JList(timeline.toArray());
         list.setCellRenderer(new setTimeline());
@@ -130,7 +132,7 @@ public class Main extends JFrame implements ListSelectionListener{
 
         add(panel2);
 
-        button.addActionListener(new ActionListener() {
+        button1.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -144,6 +146,7 @@ public class Main extends JFrame implements ListSelectionListener{
                 }
             }
         });
+
         setVisible(true); //表示
     }
 
@@ -173,8 +176,8 @@ public class Main extends JFrame implements ListSelectionListener{
                     Twitter twitter = Utils.getInst();
                     String message = text.getText();
                     try {
-                    	twitter.updateStatus(new StatusUpdate(message).inReplyToStatusId(status.getId()));
-                    	dialog.dispose();
+                        twitter.updateStatus(new StatusUpdate(message).inReplyToStatusId(status.getId()));
+                        dialog.dispose();
                     } catch (TwitterException e1) {
                         e1.printStackTrace(); //To change body of catch statement use File | Settings | File Templates.
                     }
@@ -248,16 +251,8 @@ public class Main extends JFrame implements ListSelectionListener{
             new LoginActivity("hoge");
         }
 
-        Twitter twitter = Utils.getInst();
-        try {
-            timeline = twitter.getHomeTimeline(new Paging(1,200));
-        } catch (TwitterException e) {
-            e.printStackTrace(); //To change body of catch statement use File | Settings | File Templates.
-        }
-
-        for(Status status : timeline){
-            tweet.add(status.getText());
-        }
+        timeline = Utils.getTimeLine();
+        tweet = Utils.getTweet();
         new Main("hoge");
     }
 }
