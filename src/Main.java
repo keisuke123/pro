@@ -1,8 +1,6 @@
-import twitter4j.Paging;
-import twitter4j.Status;
-import twitter4j.StatusUpdate;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
+import twitter4j.*;
+import twitter4j.conf.Configuration;
+import twitter4j.conf.ConfigurationBuilder;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -44,6 +42,7 @@ public class Main extends JFrame implements ListSelectionListener{
 
     JList list;
 
+    static private DefaultListModel model  = new DefaultListModel();
     private Dialog dialog;
     Main(String name){
 
@@ -119,10 +118,12 @@ public class Main extends JFrame implements ListSelectionListener{
         panel1.add(text);
         panel1.add(button1);
 
-        list = new JList(timeline.toArray());
+        for(Object status : timeline.toArray()){
+         model.addElement(status);
+        }
+        list = new JList(model);
         list.setCellRenderer(new setTimeline());
         list.addListSelectionListener(this);
-
         JScrollPane pane = new JScrollPane();
         pane.getViewport().setView(list);
         JPanel panel2 = new JPanel();
@@ -164,7 +165,7 @@ public class Main extends JFrame implements ListSelectionListener{
 
             button.setAlignmentX(0.5f);
             text.setLineWrap(true);
-            text.setText("@" + status.getUser().getScreenName()+" ");
+            text.setText("@" + status.getUser().getScreenName() + " ");
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             panel.add(text);
             panel.add(button);
@@ -236,10 +237,21 @@ public class Main extends JFrame implements ListSelectionListener{
             panel.add(image);
             panel.add(name);
 
-
             return panel; //To change body of implemented methods use File | Settings | File Templates.
         }
     }
+
+    static class myStream extends UserStreamAdapter{
+        @Override
+        public void onStatus(Status status) {
+            super.onStatus(status);
+            // 6. UserStream 受信時、3 で実装したメソッドが呼び出されるので必要な処理をする
+            // サンプルログ出力\
+            // ここではサンプルとして通知発行メソッドを呼び出している\
+            model.add(0,status);
+        }
+    }
+
 
     public static void main(String[] args){
         Properties prop;
@@ -248,11 +260,20 @@ public class Main extends JFrame implements ListSelectionListener{
 
         //もしAccessTokenが保存されていなかったら
         if(prop.getProperty("oauth.accessToken")==null){
-            new LoginActivity("hoge");
+            new LoginActivity("認証");
         }
 
         timeline = Utils.getTimeLine();
         tweet = Utils.getTweet();
-        new Main("hoge");
+
+        ConfigurationBuilder build = new ConfigurationBuilder();
+        Configuration conf = build.build();
+        TwitterStream stream = new TwitterStreamFactory(conf).getInstance();
+
+        stream.addListener(new myStream());
+        stream.user();
+
+        new Main("スーモの里β");
     }
 }
+
